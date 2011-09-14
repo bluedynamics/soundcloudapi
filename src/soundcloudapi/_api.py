@@ -29,23 +29,8 @@ class Base(object):
     def _check_response(self, response, exception_class, errormsg, code=200):
         if response.status_int != code:
             raise exception_class, '%s Status %i' % (errormsg, 
-                                                     response.status_int)
-            
-class AuthBase(Base):
-    
-    def __init__(self, configuration, scid):
-        super(AuthBase, self).__init__(configuration)
-        self._baseuri = BASEURI
-        self.id = scid
-        
-    @property
-    def is_authenticated(self):
-        self.configuration.token is not None
-        
-    def authenticator(self, configuration):
-        pass
-                
-            
+                                                     response.status_int)        
+                            
 class IdBase(Base):            
 
     def __init__(self, configuration, scid):

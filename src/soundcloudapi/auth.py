@@ -1,6 +1,6 @@
 # see http://developers.soundcloud.com/docs/api/authentication
 # and http://tools.ietf.org/html/draft-ietf-oauth-v2-10
-import re
+import urllib
 import urlparse
 import json
 from restkit import request
@@ -11,6 +11,7 @@ from .exceptions import (
 
 URL_STEP1 = 'https://soundcloud.com/connect'
 URL_STEP2 = 'https://api.soundcloud.com/oauth2/token'
+
 
 class AuthInfo(object):
     
@@ -42,6 +43,8 @@ class AuthInfo(object):
         query = self._base_params 
         query['response_type'] = 'code'
         query['scope'] = self.scope
+        if self.popup:
+            query['display'] = 'popup'
         query = '&'.join(['%s=%s' % (_, query[_]) for _ in sorted(query)])
         return '%s?%s' % (URL_STEP1, query)
     
@@ -66,33 +69,55 @@ class AuthInfo(object):
         self.token = result[u'access_token']
         return self.token
     
-class AuthFilter(object):
     
-    def __init__(self, path, authinfo):
-        if path.endswith('*'):
-            self.match = re.compile("%s.*" % path.rsplit('*', 1)[0])
+class BaseAuth(object):
+    
+    def __init__(self, authinfo, chooser='*'):
+        """
+        ``chooser`` 
+           callable expecting filter and request as params and returns bool if
+           this filter applies or not. 
+           chooser='*' applies an always True callable.    
+        ``authinfo`` an instance of soundcloudapi.auth.AuthInfo
+        """
+        if chooser == '*':
+            self.chooser = lambda filter, request: True
         else:
-            self.match = re.compile("%s$" % path)
+            self.chooser = chooser
         self.authinfo = authinfo
                     
     def on_path(self, request):
-        path = request.parsed_url.path or "/"
-        return (self.match.match(path) is not None)
+        return self.chooser(self, request)
     
+    def on_request(self, request):
+        raise NotImplementedError('Do not use abstract class')
+    
+    
+class PrivateAuth(BaseAuth):
+          
     def on_request(self, request):
         if not self.on_path(request):
             return
-        private = request.parsed_url.path.startswith('/me')
-        if private and self.authinfo.authorized:
-            request.headers['Authorization'] = 'OAuth %s' % self.authinfo.token
-            return
-        elif private and not self.authinfo.authorized:
-            raise SoundcloudUnauthorized('Theres no authorization token')
-        # for non private only append client_id
+        if not self.authinfo.authenticated:
+            raise SoundcloudUnauthorized('Theres no authorization token')        
+        request.headers['Authorization'] = 'OAuth %s' % self.authinfo.token
+        import pdb;pdb.set_trace()
+    
+        
+class PublicAuth(BaseAuth):
+          
+    def on_request(self, request):
+        if not self.on_path(request):            
+            return        
         if request.method in ('PUT', 'POST'):
             pass
         elif request.method in ('GET', 'DELETE'):
-            pass
+            parsed = request.parsed_url
+            query = urlparse.parse_qs(parsed.query)
+            query['client_id'] = self.authinfo.client_id
+            request.url = urlparse.urlunparse((
+                parsed.scheme, parsed.netloc, parsed.path, parsed.params, 
+                urllib.urlencode(query, True), parsed.fragment))
         else:
             raise SoundcloudException('HTTP method %s not supported' % 
                                       request.method)                        
