@@ -1,0 +1,7 @@
+[testenv]
+# copy as testenv.ini and fill the copy with your secret values
+CLIENT_ID     = REPLACE_ME
+CLIENT_SECRET = REPLACE_ME
+REDIRECT_URI  = REPLACE_ME
+CODE          = 
+TOKEN         = 
