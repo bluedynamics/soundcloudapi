@@ -87,6 +87,7 @@ Private Resource::
     ...                     filters=[private_filter])
     >>> resp = resource.get()
     >>> result = json.loads(resp.body_string())
-    >>> result
+    >>> 'full_name' in result
+    True
 
     

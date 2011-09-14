@@ -101,7 +101,6 @@ class PrivateAuth(BaseAuth):
         if not self.authinfo.authenticated:
             raise SoundcloudUnauthorized('Theres no authorization token')        
         request.headers['Authorization'] = 'OAuth %s' % self.authinfo.token
-        import pdb;pdb.set_trace()
     
         
 class PublicAuth(BaseAuth):
