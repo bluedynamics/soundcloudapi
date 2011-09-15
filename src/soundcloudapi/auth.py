@@ -15,8 +15,8 @@ URL_STEP2 = 'https://api.soundcloud.com/oauth2/token'
 
 class AuthInfo(object):
     
-    def __init__(self, client_id, client_secret, redirect_uri, token=None,
-                 scope='non-expiring', popup=False):
+    def __init__(self, client_id, client_secret=None, redirect_uri=None, 
+                 token=None, scope='non-expiring', popup=False):
         self.client_id = client_id    
         self.client_secret = client_secret   
         self.redirect_uri = redirect_uri
@@ -46,7 +46,7 @@ class AuthInfo(object):
         if self.popup:
             query['display'] = 'popup'
         query = '&'.join(['%s=%s' % (_, query[_]) for _ in sorted(query)])
-        return '%s?%s' % (URL_STEP1, query)
+        return '%s?%s' % (URL_STEP1, urllib.quote(query))
     
     def _step2_body(self, code):
         body = self._base_params 

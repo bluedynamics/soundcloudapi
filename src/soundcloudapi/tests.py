@@ -9,6 +9,7 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
 
 TESTFILES = [
     'auth.rst',
+    '_api.rst',
 ]
 
 def test_suite():
