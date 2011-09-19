@@ -6,15 +6,15 @@ class Soundcloud(object):
     def __init__(self, authinfo):
         self.authinfo = authinfo
         
-    def users(self, scid):
+    def users(self, scid=None, filter=None):
         """A SoundCloud user
         """
-        return _api.Users(self.authinfo, scid)
+        return _api.Users(self.authinfo, scid=scid, filter=filter)    
 
     def tracks(self, scid=None, filter=None):
         """A SoundCloud track
         """
-        return _api.Tracks(self.authinfo, userid=userid, filter=filter)
+        return _api.Tracks(self.authinfo, scid=scid, filter=filter)
     
     def playlists(self, scid=None, filter=None):
         """A SoundCloud Set is internally called playlists due to some naming 
@@ -48,6 +48,7 @@ class Soundcloud(object):
         return _api.Apps(self.authinfo, scid)
     
     def resolve(self, url):
-        """
+        """The resolve resource allows you to lookup and access API resources 
+        when you only know the SoundCloud.com URL
         """
         return _api.Resolve(self.authinfo, url)()
