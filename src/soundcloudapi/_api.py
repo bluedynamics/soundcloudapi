@@ -1,4 +1,5 @@
 # see https://twimg0-a.akamaihd.net/profile_background_images/25029373/http-headers-status.gif
+import re
 import json
 import urllib
 from restkit import Resource
@@ -27,7 +28,8 @@ BOUNDARY = '---==ThIs_Is_tHe_bouNdaRY_f0r_ThE_$0uNdC10uD==--'
 SECRET_TOKEN_TPL = "%{stream_url}s?secret_token=%{secret_token}s&client_id="+\
                    "%{client_id}"                
 ZEROPUT = {'Content-Length': '0'}
-ACCEPT = {'Accept': 'application/json'}                    
+ACCEPT = {'Accept': 'application/json'}
+TRACKID_REGEXP = re.compile(r'https?://api.soundcloud.com/tracks/([0-9]+)*')
 
 def private_chooser(filter, request):
     return request.method.upper != 'GET' \
@@ -97,14 +99,14 @@ class Base(object):
     def _to_dict(self, resp):
         return json.loads(resp.body_string())
     
-    def _get(self, path, data={}):
+    def _get(self, path, data={}, retcodes=[200]):
         try:
             resp = self._resource.get(path=path, params_dict=data, 
                                       headers=ACCEPT)
         except ResourceNotFound, e:
             return {'error': e.response.status, 'status': e.response.status_int}
         else:
-            self._check_response(resp, 'GET %s' % path)
+            self._check_response(resp, 'GET %s' % path, codes=retcodes)
         return self._to_dict(resp)
     
     def _delete(self, path):
@@ -130,14 +132,7 @@ class Base(object):
         self._check_response(resp, 'POST %s with %s' % (path, data))
         return self._to_dict(resp)
     
-    def _subresource_dispatcher(self, 
-                                subpath=None, 
-                                scid=None, 
-                                delete=False, 
-                                postdata=None, 
-                                putdata=None, 
-                                getdata=None,
-                                allowed_methods=['GET']):
+    def _make_path(self, subpath=None, scid=None):
         path = ''
         if hasattr(self, 'id') and self.id is not None:
             path += '/%s' % self.id
@@ -145,7 +140,18 @@ class Base(object):
             path += '/%s'% subpath
         if scid is not None:
             path += '/%s' % scid
-        path = path.lstrip('/')
+        return path.lstrip('/')        
+    
+    def _subresource_dispatcher(self, 
+                                subpath=None, 
+                                scid=None, 
+                                delete=False, 
+                                postdata=None, 
+                                putdata=None, 
+                                getdata=None,
+                                allowed_methods=['GET'],
+                                retcodes=[200]):
+        path = self._make_path(subpath, scid)
         if delete:
             if 'DELETE' not in allowed_methods:
                  raise SoundcloudException('DELETE is not permitted.')
@@ -155,7 +161,7 @@ class Base(object):
         if putdata is None and postdata is None:
             if 'GET' not in allowed_methods:
                 raise SoundcloudException('GET is not permitted.')
-            return self._get(path, data=getdata)
+            return self._get(path, data=getdata, retcodes=retcodes)
         if putdata is not None and postdata is not None:
             raise SoundcloudException('Provide putdata or postdata, not both.')
         if putdata is not None:
@@ -165,6 +171,7 @@ class Base(object):
         if 'POST' not in allowed_methods:
             raise SoundcloudException('POST is not permitted.')
         return self._post(path, postdata)    
+                     
                             
 class IdBase(Base):            
 
@@ -196,7 +203,7 @@ class IdFilterBase(IdBase):
             subpath, scid, delete, postdata, putdata, getdata, allowed_methods
         )
         
-class IdXorFilterBase(IdBase):
+class IdXorFilterBase(IdFilterBase):
         
     def __init__(self, authinfo, scid=None, filter=None):
         super(IdXorFilterBase, self).__init__(authinfo, scid, filter)
@@ -365,5 +372,13 @@ class Resolve(Base):
     _subpath = 'resolve'                
 
     def __call__(self, url):
-        return self._subresource_dispatcher()
-            
+        try:
+            resp = self._resource.get(path=self._make_path(), 
+                                      params_dict=dict(url=url), 
+                                      headers=ACCEPT)
+        except ResourceNotFound, e:
+            return {'error': e.response.status, 'status': e.response.status_int}
+        else:
+            self._check_response(resp, 'GET %s' % self._make_path(), codes=[302])
+        match = TRACKID_REGEXP.match(resp.headers['Location'])
+        return match.group(1)            

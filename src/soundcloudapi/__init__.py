@@ -52,4 +52,4 @@ class Soundcloud(object):
         """The resolve resource allows you to lookup and access API resources 
         when you only know the SoundCloud.com URL
         """
-        return _api.Resolve(self.authinfo, url)()
+        return _api.Resolve(self.authinfo)(url)
