@@ -46,7 +46,7 @@ class AuthInfo(object):
         if self.popup:
             query['display'] = 'popup'
         query = '&'.join(['%s=%s' % (_, query[_]) for _ in sorted(query)])
-        return '%s?%s' % (URL_STEP1, urllib.quote(query))
+        return '%s?%s' % (URL_STEP1, query)
     
     def _step2_body(self, code):
         body = self._base_params 

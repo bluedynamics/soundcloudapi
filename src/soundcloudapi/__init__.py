@@ -1,5 +1,6 @@
 import _api
 from .auth import AuthInfo
+from .exceptions import SoundcloudException
 
 class Soundcloud(object):
     

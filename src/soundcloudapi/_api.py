@@ -67,7 +67,7 @@ class Base(object):
         self.authinfo = authinfo
         self._instance = None
         self._private_filter = PrivateAuth(authinfo, private_chooser)
-        self._public_filter = PrivateAuth(authinfo, public_chooser)
+        self._public_filter = PublicAuth(authinfo, public_chooser)
         
     @property
     def _subpath(self):
