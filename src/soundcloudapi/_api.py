@@ -29,7 +29,7 @@ SECRET_TOKEN_TPL = "%{stream_url}s?secret_token=%{secret_token}s&client_id="+\
                    "%{client_id}"                
 ZEROPUT = {'Content-Length': '0'}
 ACCEPT = {'Accept': 'application/json'}
-TRACKID_REGEXP = re.compile(r'https?://api.soundcloud.com/tracks/([0-9]+)*')
+ID_REGEXP = re.compile(r'https?://api.soundcloud.com/\S+?/([0-9]+)*')
 
 def private_chooser(filter, request):
     return request.method.upper != 'GET' \
@@ -380,5 +380,7 @@ class Resolve(Base):
             return {'error': e.response.status, 'status': e.response.status_int}
         else:
             self._check_response(resp, 'GET %s' % self._make_path(), codes=[302])
-        match = TRACKID_REGEXP.match(resp.headers['Location'])
-        return match.group(1)            
+        match = ID_REGEXP.match(resp.headers['Location'])
+        if match is not None:
+            return match.group(1)
+        return ''
