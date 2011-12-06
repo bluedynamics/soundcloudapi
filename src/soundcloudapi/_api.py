@@ -341,6 +341,9 @@ class Tracks(IdXorFilterBase, SharedToMixin, SecretTokenMixin):
 class Playlists(IdXorFilterBase, SharedToMixin, SecretTokenMixin):
 
     _subpath = 'playlists'
+    
+    def __call__(self, data=None):
+        return self._subresource_dispatcher(allowed_methods=['GET'])
 
 
 class Groups(IdXorFilterBase):
