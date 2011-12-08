@@ -44,8 +44,11 @@ def public_chooser(filter, request):
 def soundcloud_flat_dict(data, baseprefix):
     new = MultiDict()
     
-    def _flattening(current, prefix):    
-        if hasattr(current, 'items'): # some kind of dict
+    def _flattening(current, prefix):
+        # stream handling!
+        if hasattr(current, 'read'): # some kind of filelike, has also __iter__!
+            new.add(prefix, current)
+        elif hasattr(current, 'items'): # some kind of dict
             for key, value in current.items():
                 _flattening(value, '%s[%s]' % (prefix, key))
         elif hasattr(current, '__iter__'): # some kind of list
