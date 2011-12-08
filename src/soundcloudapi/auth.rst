@@ -18,7 +18,7 @@ Basic tests with AuthInfo::
     >>> from soundcloudapi.auth import AuthInfo
     >>> authinfo = AuthInfo('TESTID', 'TESTSECRET', 'HTTP://REDIRECT.URL')
     >>> authinfo.redirect_url   
-    'https://soundcloud.com/connect?client_id%3DTESTID%26client_secret%3DTESTSECRET%26redirect_uri%3DHTTP%3A//REDIRECT.URL%26response_type%3Dcode%26scope%3Dnon-expiring'
+    'https://soundcloud.com/connect?client_id=TESTID&client_secret=TESTSECRET&redirect_uri=HTTP://REDIRECT.URL&response_type=code&scope=non-expiring'
 
     >>> authinfo._step2_body('TESTCODE')
     'client_id=TESTID&client_secret=TESTSECRET&code=TESTCODE&grant_type=authorization_code&redirect_uri=HTTP://REDIRECT.URL'
@@ -47,7 +47,7 @@ CODE in ``testenv.cfg`` (its a one-time code ) and run buildout::
     
 Run the test again. You'll get the token from the code below::
 
-    >>> if CODE:
+    >>> if CODE and not TOKEN:
     ...     authinfo.token_from_code(CODE)
     
 
