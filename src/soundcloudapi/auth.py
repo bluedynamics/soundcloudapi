@@ -86,7 +86,7 @@ class BaseAuth(object):
             self.chooser = chooser
         self.authinfo = authinfo
                     
-    def on_path(self, request):
+    def _check_path(self, request):
         return self.chooser(self, request)
     
     def on_request(self, request):
@@ -96,7 +96,7 @@ class BaseAuth(object):
 class PrivateAuth(BaseAuth):
           
     def on_request(self, request):
-        if not self.on_path(request):
+        if not self._check_path(request):
             return
         if not self.authinfo.authenticated:
             raise SoundcloudUnauthorized('Theres no authorization token')        
@@ -106,7 +106,7 @@ class PrivateAuth(BaseAuth):
 class PublicAuth(BaseAuth):
           
     def on_request(self, request):
-        if not self.on_path(request):            
+        if not self._check_path(request):
             return        
         if request.method in ('PUT', 'POST'):
             pass
