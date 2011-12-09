@@ -98,7 +98,32 @@ Users Public API
     >>> luh = sc.tracks(22647936)
     >>> me = sc.me()
 
-    >>> interact(locals())
+Tracks
+======
+
+Upload
+------
+
+First create a tracks instance w/o id nor with filter::: 
+
+    >>> tracks = sc.tracks()
+
+open a file to upload::
+
+    >>> import os
+    >>> testsmp3 = open(os.path.join(basepath, 'tests.mp3'), 'rb')
+    
+build the dict for upload, we provide at least a title::
+    
+    >>> upload_data = dict()
+    >>> upload_data['asset_data'] = testsmp3
+    >>> upload_data['title'] = 'bda soundcloudapi test'
+    
+finally upload::
+
+    >>> tracks(upload_data)
+    
+    >> interact(locals())
     
     
     

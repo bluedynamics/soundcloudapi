@@ -1,3 +1,4 @@
+import os
 import unittest
 import doctest 
 from pprint import pprint
@@ -18,7 +19,8 @@ def test_suite():
             file, 
             optionflags=optionflags,
             globs={'interact': interact,
-                   'pprint': pprint},
+                   'pprint': pprint,
+                   'basepath': os.path.dirname(__file__)},
         ) for file in TESTFILES
     ])
 

@@ -4,6 +4,7 @@ import urllib
 import urlparse
 import json
 from restkit import request
+from restkit.forms import BoundaryItem
 from .exceptions import (
     SoundcloudException,
     SoundcloudUnauthorized,
@@ -99,9 +100,17 @@ class PrivateAuth(BaseAuth):
         if not self._check_path(request):
             return
         if not self.authinfo.authenticated:
-            raise SoundcloudUnauthorized('Theres no authorization token')        
-        request.headers['Authorization'] = 'OAuth %s' % self.authinfo.token
-    
+            raise SoundcloudUnauthorized('Theres no authorization token')                
+        if request.method in ('PUT', 'POST'):
+            authboundary = BoundaryItem('oauth_token', self.authinfo.token)
+            request.body.boundaries.append(authboundary)
+            request.body._clen = None # empty length cache
+            request.headers['Content-Length'] = str(request.body.get_size())
+        elif request.method in ('GET', 'DELETE'):
+            request.headers['Authorization'] = 'OAuth %s' % self.authinfo.token
+        else:
+            raise SoundcloudException('HTTP method %s not supported' % 
+                                      request.method)                            
         
 class PublicAuth(BaseAuth):
           
