@@ -103,7 +103,7 @@ class PrivateAuth(BaseAuth):
             raise SoundcloudUnauthorized('Theres no authorization token')                
         if request.method in ('PUT', 'POST'):
             authboundary = BoundaryItem('oauth_token', self.authinfo.token)
-            request.body.boundaries.append(authboundary)
+            request.body.boundaries.insert(0, authboundary)
             request.body._clen = None # empty length cache
             request.headers['Content-Length'] = str(request.body.get_size())
         elif request.method in ('GET', 'DELETE'):
