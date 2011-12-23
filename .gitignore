@@ -1,12 +1,13 @@
 bin/
 var/
 eggs/
+devsrc/
 develop-eggs/
 parts/
 src/*.egg-info
 *.pyc
 .project
-.installed.cfg
+.*.cfg
 .pydevproject
 .tmp*
 dist
