@@ -1,0 +1,1 @@
+see https://groups.google.com/d/topic/soundcloudapi/NUmN6JkGxcE/discussion
