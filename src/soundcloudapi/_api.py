@@ -167,7 +167,7 @@ class Base(object):
         if delete:
             if 'DELETE' not in allowed_methods:
                  raise SoundcloudException('DELETE is not permitted.')
-            if scid is None:
+            if scid is None and not getattr(self, 'id', None):
                 raise SoundcloudException('ID is missing for DELETE.')
             return self._delete(path)
         if putdata is None and postdata is None:
