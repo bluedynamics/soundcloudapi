@@ -32,7 +32,6 @@ SECRET_TOKEN_TPL = "%{stream_url}s?secret_token=%{secret_token}s/client_id=" + \
                    "%{client_id}"
 ZEROPUT = {'Content-Length': '0'}
 ACCEPT = {'Accept': 'application/json'}
-EXPECT = {'Expect': '100-continue'}
 ID_REGEXP = re.compile(r'https?://api.soundcloud.com/\S+?/([0-9]+)*')
 
 def private_chooser(filter, request):
@@ -128,7 +127,6 @@ class Base(object):
         else:
             payload, headers = prepare_payload(data, self._prefix)
         headers.update(ACCEPT)
-        headers.update(EXPECT)        
         resp = self._resource.put(path=path, headers=headers, payload=payload)
         self._check_response(resp, 'PUT %s with %s' % (path, data))
         return self._to_dict(resp)
@@ -136,10 +134,10 @@ class Base(object):
     def _post(self, path, data):
         payload, headers = prepare_payload(data, self._prefix)
         headers.update(ACCEPT)
-        headers.update(EXPECT)        
+        print headers, payload
         resp = self._resource.post(path=path, headers=headers, payload=payload)
         self._check_response(resp, 'POST %s with %s' % (path, data), 
-                             codes=[201])
+                             codes=[201])        
         return self._to_dict(resp)
 
     def _make_path(self, subpath=None, scid=None):
@@ -248,7 +246,7 @@ class SharedToMixin(object):
             params.add('%s[][%s]' % (context, key), value)
         return self._subresource_dispatcher(
             'shared-to/%s' % context,
-            scid=scid,
+            scid=self.scid,
             delete=delete,
             postdata=replace and params or None,
             putdata=not replace and params or None,
