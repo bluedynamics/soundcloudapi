@@ -94,7 +94,6 @@ class Base(object):
 
     @property
     def _resource(self):
-        print 'URI:', self._uri
         return Resource(self._uri, filters=[self._private_filter,
                                             self._public_filter])
 
@@ -128,8 +127,6 @@ class Base(object):
         else:
             payload, headers = prepare_payload(data, self._prefix)
         headers.update(ACCEPT)
-        print 'PATH: ', path
-        print 'HEAD: ', headers
         resp = self._resource.put(path=path, headers=headers, payload=payload)
         self._check_response(resp, 'PUT %s with %s' % (path, data))
         return self._to_dict(resp)
