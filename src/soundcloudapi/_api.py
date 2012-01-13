@@ -94,6 +94,7 @@ class Base(object):
 
     @property
     def _resource(self):
+        print 'URI:', self._uri
         return Resource(self._uri, filters=[self._private_filter,
                                             self._public_filter])
 
@@ -127,6 +128,8 @@ class Base(object):
         else:
             payload, headers = prepare_payload(data, self._prefix)
         headers.update(ACCEPT)
+        print 'PATH: ', path
+        print 'HEAD: ', headers
         resp = self._resource.put(path=path, headers=headers, payload=payload)
         self._check_response(resp, 'PUT %s with %s' % (path, data))
         return self._to_dict(resp)
@@ -328,12 +331,14 @@ class Tracks(IdXorFilterBase, SharedToMixin, SecretTokenMixin):
 
     _subpath = 'tracks'
 
-    def __call__(self, data=None):
+    def __call__(self, data=None, delete=False):
         upload = data and self.id is None
         result = self._subresource_dispatcher(
+                                delete=delete,
                                 putdata=not upload and data or None,
                                 postdata=upload and data or None,
-                                allowed_methods=['GET', 'PUT', 'POST'])
+                                allowed_methods=['GET', 'PUT', 'POST', 
+                                                 'DELETE'])
         if upload:
             self.id = result['id']
         return result
