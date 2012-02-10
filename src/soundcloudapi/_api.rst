@@ -122,11 +122,7 @@ build the dict for upload, we provide at least a title::
 finally upload::
 
     >>> tracks(upload_data)
+    {...}
     
-FAILS! See
-http://groups.google.com/group/soundcloudapi/browse_frm/thread/35498de89906c5c1#
-
-    >> interact(locals())
-
 
 

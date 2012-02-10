@@ -7,15 +7,6 @@ from restkit import Resource
 from restkit.errors import ResourceNotFound
 from restkit.forms import multipart_form_encode
 from restkit.datastructures import MultiDict
-from restkit.globals import set_manager, get_manager
-try:
-    import eventlet
-    eventlet.monkey_patch()
-    from restkit.manager.meventlet import EventletManager
-    set_manager(EventletManager(timeout=60))
-except ImportError:
-    from restkit import Manager
-    set_manager(Manager(max_conn=10))
 from .exceptions import SoundcloudException
 from .auth import (
     PublicAuth,
@@ -328,7 +319,7 @@ class Tracks(IdXorFilterBase, SharedToMixin, SecretTokenMixin):
 
     _subpath = 'tracks'
 
-    def __call__(self, data=None, delete=False):
+    def __call__(self, data=None, delete=False, scid=None, filter=None):
         upload = data and self.id is None
         result = self._subresource_dispatcher(
                                 delete=delete,
