@@ -255,8 +255,8 @@ class UserMixin(object):
     def __call__(self):
         return self._subresource_dispatcher()
 
-    def tracks(self):
-        return self._subresource_dispatcher('tracks')
+    def tracks(self, filter=None):
+        return self._subresource_dispatcher('tracks', getdata=filter)
 
     def playlists(self):
         return self._subresource_dispatcher('playlists')
