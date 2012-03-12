@@ -127,6 +127,7 @@ class Base(object):
         headers.update(ACCEPT)
         print headers, payload
         resp = self._resource.post(path=path, headers=headers, payload=payload)
+        print resp
         self._check_response(resp, 'POST %s with %s' % (path, data), 
                              codes=[201])        
         return self._to_dict(resp)
