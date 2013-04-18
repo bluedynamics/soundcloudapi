@@ -121,8 +121,25 @@ build the dict for upload, we provide at least a title::
     
 finally upload::
 
-    >>> tracks(upload_data)
+    >>> result = tracks(upload_data)
+    >>> result
     {...}
+       
+    >>> 'id' in result
+    True
+     
+    >>> scid = result['id']
     
+    >>> tests2mp3 = open(os.path.join(basepath, 'tests2.mp3'), 'rb')
+    >>> upload_data2 = dict()
+    >>> upload_data2['asset_data'] = tests2mp3
+    >>> upload_data2['title'] = 'bda soundcloudapi test 2'
+
+    >>> tracks2 = sc.tracks(scid)
+    >>> result2 = tracks2(data=upload_data2)
+    >>> result2['id'] == scid
+    True 
+    
+    >>> interact(locals())  
 
 

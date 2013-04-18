@@ -125,11 +125,9 @@ class Base(object):
     def _post(self, path, data):
         payload, headers = prepare_payload(data, self._prefix)
         headers.update(ACCEPT)
-        print headers, payload
         resp = self._resource.post(path=path, headers=headers, payload=payload)
-        print resp
-        self._check_response(resp, 'POST %s with %s' % (path, data), 
-                             codes=[201])        
+        self._check_response(resp, 'POST %s with %s' % (path, data),
+                             codes=[201])
         return self._to_dict(resp)
 
     def _make_path(self, subpath=None, scid=None):
@@ -326,7 +324,7 @@ class Tracks(IdXorFilterBase, SharedToMixin, SecretTokenMixin):
                                 delete=delete,
                                 putdata=not upload and data or None,
                                 postdata=upload and data or None,
-                                allowed_methods=['GET', 'PUT', 'POST', 
+                                allowed_methods=['GET', 'PUT', 'POST',
                                                  'DELETE'])
         if upload:
             self.id = result['id']
