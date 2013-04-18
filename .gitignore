@@ -12,3 +12,5 @@ src/*.egg-info
 .tmp*
 dist
 testenv.cfg
+include
+lib
